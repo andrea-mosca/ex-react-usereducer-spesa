@@ -1,21 +1,83 @@
+import { useState } from "react";
 import "./App.css";
+
 const products = [
   { name: "Mela", price: 0.5 },
   { name: "Pane", price: 1.2 },
   { name: "Latte", price: 1.0 },
   { name: "Pasta", price: 0.7 },
 ];
+
 function App() {
+  const [addedProducts, setAddedProducts] = useState([]);
+  console.log(addedProducts);
+
+  const updateProductQuantity = (p) => {
+    setAddedProducts((curr) =>
+      curr.map((item) =>
+        item.name === p.name ? { ...item, quantity: item.quantity + 1 } : item
+      )
+    );
+  };
+
+  const addToCart = (product) => {
+    const esiste = addedProducts.some((item) => item.name === product.name);
+    if (esiste) {
+      updateProductQuantity(product);
+      return;
+    }
+
+    setAddedProducts((curr) => [...curr, { ...product, quantity: 1 }]);
+  };
+
+  const removeFromCart = (product) => {
+    const prodottoRimosso = addedProducts.filter(
+      (p) => p.name !== product.name
+    );
+    setAddedProducts(prodottoRimosso);
+  };
+
+  const prezzoTotale = () => {
+    let prezzoProdotti = 0;
+    addedProducts.map((p) => {
+      let prezzoSingoloProdotto = p.price * p.quantity;
+      prezzoProdotti = prezzoProdotti + prezzoSingoloProdotto;
+    });
+    return prezzoProdotti.toFixed(2);
+  };
+
   return (
     <div>
       <h1>Lista prodotti</h1>
       <ul>
         {products.map((p, i) => (
           <li key={i}>
-            `{p.name} costa {p.price}€ al Kg`
+            <p>
+              {p.name} costa {p.price}€ al Kg
+            </p>
+            <button onClick={() => addToCart(p)}>Aggiungi al carrello</button>
+            <button onClick={() => removeFromCart(p)}>
+              rimuovi dal carrello
+            </button>
           </li>
         ))}
       </ul>
+
+      {addedProducts.length > 0 && (
+        <div>
+          <h2>Carrello</h2>
+          <ul>
+            {addedProducts.map((item, index) => (
+              <li key={index}>
+                <div>
+                  {item.name} - {item.price}€ - Quantità: {item.quantity}
+                </div>
+              </li>
+            ))}
+          </ul>
+          <div>totale da pagare: {prezzoTotale(addedProducts)}€</div>
+        </div>
+      )}
     </div>
   );
 }
