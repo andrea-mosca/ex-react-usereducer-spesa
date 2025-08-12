@@ -12,11 +12,11 @@ function App() {
   const [addedProducts, setAddedProducts] = useState([]);
   console.log(addedProducts);
 
-  const updateProductQuantity = (p) => {
+  const updateProductQuantity = (name, quantity) => {
+    if (quantity < 1 || isNaN(quantity)) return;
+
     setAddedProducts((curr) =>
-      curr.map((item) =>
-        item.name === p.name ? { ...item, quantity: item.quantity + 1 } : item
-      )
+      curr.map((item) => (item.name === name ? { ...item, quantity } : item))
     );
   };
 
@@ -56,9 +56,6 @@ function App() {
               {p.name} costa {p.price}€ al Kg
             </p>
             <button onClick={() => addToCart(p)}>Aggiungi al carrello</button>
-            <button onClick={() => removeFromCart(p)}>
-              rimuovi dal carrello
-            </button>
           </li>
         ))}
       </ul>
@@ -69,9 +66,19 @@ function App() {
           <ul>
             {addedProducts.map((item, index) => (
               <li key={index}>
-                <div>
-                  {item.name} - {item.price}€ - Quantità: {item.quantity}
-                </div>
+                <input
+                  type="number"
+                  value={item.quantity}
+                  onChange={(e) =>
+                    updateProductQuantity(item.name, parseInt(e.target.value))
+                  }
+                />
+                <span>
+                  {item.name} - {item.price}€
+                </span>
+                <button onClick={() => removeFromCart(item)}>
+                  rimuovi dal carrello
+                </button>
               </li>
             ))}
           </ul>
